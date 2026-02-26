@@ -1,98 +1,27 @@
-services:
-  main-gw:
-    build:
-      context: primary-build
-      args:
-        IGNITION_VERSION: 8.1.50
-    hostname: main-host
-    container_name: demo-main
-    ports:
-      - 9010:8088
-      - 1863:1883
-    volumes:
-      - main-data:/usr/local/bin/ignition/data
-#      - ./gw-init/main_gw.gwbk:/restore.gwbk
-    networks:
-      - main-network
-      - edge-network
-      - edge-network-2
-    environment:
-      - IGNITION_EDITION=standard
-      - GATEWAY_ADMIN_PASSWORD=katlego
-      - GATEWAY_MODULES_ENABLED=alarm-notification,enterprise-administration,opc-ua,perspective,reporting,sfc,sms-notification,sql-bridge,symbol-factory,tag-historian,voice-notification,web-developer
-      - ACCEPT_IGNITION_EULA=Y
-    command: >
-      -n main-gw
-      -m 1024
- #     -r /restore.gwbk
-  edge-gw:
+services:  
+  iot-edge:
     build:
       context: edge-build
       args:
-        IGNITION_VERSION: 8.1.50
-    hostname: edge-host
-    container_name: demo-edge
+        IGNITION_VERSION: 8.3.3
+    container_name: iot-edge
     ports:
       - 9011:8088
-      - 1864:1883
+      - 1883:1883
     volumes:
       - edge-data:/usr/local/bin/ignition/data
-  #    - ./gw-init/edge_gw.gwbk:/restore.gwbk
-    networks:
-      - edge-network
     environment:
       - IGNITION_EDITION=edge
       - GATEWAY_ADMIN_PASSWORD=katlego
       - ACCEPT_IGNITION_EULA=Y
+      - GATEWAY_MODULES_ENABLED=alarm-notification,perspective,symbol-factory,tag-historian,reporting,
+    restart: unless-stopped
+    labels:
+      tsdproxy.enable: true
+      tsdproxy.ephemeral: false
     command: >
       -n edge-gw
       -m 1024
-#      -r /restore.gwbk
-  edge-gw-2:
-    build:
-      context: edge-build
-      args:
-        IGNITION_VERSION: 8.1.50
-    hostname: edge-host-2
-    container_name: demo-edge-2
-    ports:
-      - 9012:8088
-      - 1865:1883
-    volumes:
-      - edge-data-2:/usr/local/bin/ignition/data
-  #    - ./gw-init/edge_gw.gwbk:/restore.gwbk
-    networks:
-      - edge-network-2
-    environment:
-      - IGNITION_EDITION=edge
-      - GATEWAY_ADMIN_PASSWORD=katlego
-      - ACCEPT_IGNITION_EULA=Y
-    command: >
-      -n edge-gw-2
-      -m 1024
- #     -r /restore.gwbk
-  postgres:
-    image: postgres:16
-    container_name: postgres
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: ignition
-    ports:
-      - 5432:5432
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-    networks:
-      main-network:
-        aliases:
-          - pg-db
-    
-networks:
-  main-network:
-  edge-network:
-  edge-network-2:
 volumes:
-  main-data:
   edge-data:
-  edge-data-2:
-  postgres-data:
+  

@@ -6,7 +6,7 @@ services:
         IGNITION_VERSION: 8.3.3
     container_name: iot-edge
     ports:
-      - 9011:8088
+      - 8088:8088
       - 1883:1883
     volumes:
       - edge-data:/usr/local/bin/ignition/data
@@ -14,13 +14,13 @@ services:
       - IGNITION_EDITION=edge
       - GATEWAY_ADMIN_PASSWORD=katlego
       - ACCEPT_IGNITION_EULA=Y
-      - GATEWAY_MODULES_ENABLED=alarm-notification,perspective,symbol-factory,tag-historian,reporting,
+      - GATEWAY_MODULES_ENABLED=alarm-notification,perspective,symbol-factory,tag-historian,reporting
     restart: unless-stopped
     labels:
       tsdproxy.enable: true
       tsdproxy.ephemeral: false
     command: >
-      -n edge-gw
+      -n iot-edge
       -m 1024
 volumes:
   edge-data:
